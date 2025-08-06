@@ -1,0 +1,24 @@
+body {
+    font-family: 'Tahoma', sans-serif;
+    background-color: #121212;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+header, footer {
+    background-color: #1e1e1e;
+    padding: 1em;
+    text-align: center;
+}
+h1, h2 {
+    color: #00ffd5;
+}
+section {
+    margin: 2em;
+    padding: 1em;
+    background-color: #1e1e1e;
+    border-radius: 10px;
+}
+.tv-chart {
+    margin-top: 1em;
+}
