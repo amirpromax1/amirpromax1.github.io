@@ -2,44 +2,93 @@
 <html lang="fa">
 <head>
     <meta charset="UTF-8">
+    <title>داشبورد ترید</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داشبورد ترید شخصی</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>داشبورد ترید شخصی من</h1>
+        <h1>داشبورد تریدر شخصی</h1>
     </header>
 
+    <section class="watchlist">
+        <h2>Watchlist</h2>
+        <div class="symbols">
+            <button onclick="loadChart('BINANCE:BTCUSDT')">BTC</button>
+            <button onclick="loadChart('BINANCE:ETHUSDT')">ETH</button>
+            <button onclick="loadChart('BINANCE:BNBUSDT')">BNB</button>
+            <button onclick="loadChart('BINANCE:SOLUSDT')">SOL</button>
+            <button onclick="loadChart('BINANCE:XRPUSDT')">XRP</button>
+            <button onclick="loadChart('BINANCE:ADAUSDT')">ADA</button>
+            <button onclick="loadChart('BINANCE:DOGEUSDT')">DOGE</button>
+            <button onclick="loadChart('BINANCE:AVAXUSDT')">AVAX</button>
+            <button onclick="loadChart('BINANCE:DOTUSDT')">DOT</button>
+            <button onclick="loadChart('BINANCE:TRXUSDT')">TRX</button>
+            <button onclick="loadChart('OANDA:XAUUSD')">GOLD</button>
+        </div>
+    </section>
+
     <section class="charts">
-        <h2>چارت BTC/USDT</h2>
-        <!-- ویجت تردینگ ویو -->
-        <div class="tv-chart">
-            <iframe src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_widget&amp;symbol=BINANCE:BTCUSDT&amp;interval=1H&amp;hide_side_toolbar=false&amp;symboledit=1&amp;saveimage=1&amp;toolbarbg=f1f3f6&amp;studies=[]&amp;theme=dark&amp;style=1&amp;timezone=Asia%2FTehran&amp;withdateranges=1&amp;hideideas=1&amp;studies_overrides={}&amp;overrides={}&amp;enabled_features=[]&amp;disabled_features=[]" width="100%" height="400" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
-        </div>
-    </section>
-
-    <section class="analysis">
-        <h2>تحلیل GPT</h2>
-        <div class="gpt-box">
-            <p>اینجا تحلیل خودکار ChatGPT قرار می‌گیرد.</p>
-        </div>
-    </section>
-
-    <section class="news">
-        <h2>اخبار اقتصادی</h2>
-        <ul>
-            <li>اخبار مهم روزانه اینجا نمایش داده می‌شود.</li>
-        </ul>
-    </section>
-
-    <section class="fear-greed">
-        <h2>شاخص ترس و طمع</h2>
-        <p>مقدار فعلی: <strong>در حال بارگذاری...</strong></p>
+        <div id="mainChart" class="tv-chart"></div>
+        <button onclick="addSecondChart()">➕ افزودن چارت دوم</button>
+        <div id="secondChart" class="tv-chart" style="display:none; margin-top:20px;"></div>
+        <button onclick="removeSecondChart()" style="display:none;" id="removeBtn">🗑 حذف چارت دوم</button>
     </section>
 
     <footer>
-        <p>© 2025 AmirPromax</p>
+        <p>© 2025 amirpromax1.github.io</p>
     </footer>
+
+    <script src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        let lastSymbol = 'BINANCE:BTCUSDT';
+        let mainWidget = null;
+        let secondWidget = null;
+
+        function loadChart(symbol) {
+            lastSymbol = symbol;
+            if (mainWidget) mainWidget.remove();
+            mainWidget = new TradingView.widget({
+                autosize: true,
+                symbol: symbol,
+                interval: "1H",
+                timezone: "Asia/Tehran",
+                theme: "dark",
+                style: "1",
+                locale: "fa",
+                container_id: "mainChart"
+            });
+        }
+
+        function addSecondChart() {
+            if (!lastSymbol || secondWidget) return;
+            document.getElementById("secondChart").style.display = "block";
+            document.getElementById("removeBtn").style.display = "inline";
+            secondWidget = new TradingView.widget({
+                autosize: true,
+                symbol: lastSymbol,
+                interval: "1H",
+                timezone: "Asia/Tehran",
+                theme: "dark",
+                style: "1",
+                locale: "fa",
+                container_id: "secondChart"
+            });
+        }
+
+        function removeSecondChart() {
+            if (secondWidget) {
+                secondWidget.remove();
+                secondWidget = null;
+                document.getElementById("secondChart").style.display = "none";
+                document.getElementById("removeBtn").style.display = "none";
+            }
+        }
+
+        // بارگزاری اولیه
+        window.onload = function () {
+            loadChart(lastSymbol);
+        };
+    </script>
 </body>
 </html>
