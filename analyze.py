@@ -26,12 +26,13 @@ def analyze_market():
     )
 
     response = client.chat.completions.create(
-        model="google/gemini-2.5-pro",
-        messages=[
-            {"role": "system", "content": "شما یک تحلیل‌گر حرفه‌ای بازار کریپتو هستی. تحلیل خود را به زبان فارسی ارائه بده."},
-            {"role": "user", "content": prompt}
-        ]
-    )
+    model="google/gemini-2.5-pro",
+    messages=[
+        {"role": "system", "content": "شما یک تحلیل‌گر حرفه‌ای بازار کریپتو هستی. تحلیل خود را به زبان فارسی ارائه بده."},
+        {"role": "user", "content": prompt}
+    ],
+    max_tokens=1000  # اضافه کردن این خط
+)
 
     output = response.choices[0].message.content
     with open("analysis.txt", "w", encoding="utf-8") as f:
