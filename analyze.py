@@ -1,6 +1,6 @@
-import openai
-import requests
 import os
+import requests
+from openai import OpenAI
 
 def fetch_prices():
     url = 'https://api.coingecko.com/api/v3/simple/price'
@@ -13,26 +13,30 @@ def fetch_prices():
 
 def analyze_market():
     prices = fetch_prices()
-    summary = "قیمت لحظه‌ای ۱۰ ارز برتر دیجیتال:\n"
+    summary = "قیمت لحظه‌ای ارزهای دیجیتال:
+"
     for coin, price in prices.items():
-        summary += f"- {coin.title()}: ${price['usd']}\n"
+        summary += f"- {coin.title()}: ${price['usd']}
+"
 
-    message = summary + "\nبا توجه به قیمت‌های بالا، یک تحلیل کامل انجام بده که شامل روند کلی مارکت، تحلیل تکنیکال هر ارز، نقاط حمایت و مقاومت، پیش‌بینی تایم‌فریم ۴ ساعته، و یک پیشنهاد ترید برای هرکدام باشه."
+    prompt = summary + "\nبا توجه به قیمت‌ها، تحلیل کامل شامل:\n- روند کلی بازار\n- تحلیل هر ارز\n- حمایت/مقاومت\n- پیش‌بینی تایم ۴ ساعته\n- پیشنهاد ترید"
 
-    openai.api_key = os.getenv("OPENROUTER_API_KEY")
-    openai.api_base = "https://openrouter.ai/api/v1"
+    client = OpenAI(
+        api_key=os.getenv("OPENROUTER_API_KEY"),
+        base_url="https://openrouter.ai/api/v1"
+    )
 
-    result = openai.ChatCompletion.create(
-        model="openrouter/mistral-7b-instruct",
+    response = client.chat.completions.create(
+        model="openrouter/gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "شما یک تحلیل‌گر حرفه‌ای ارز دیجیتال هستی."},
-            {"role": "user", "content": message}
+            {"role": "user", "content": prompt}
         ]
     )
 
-    output = result["choices"][0]["message"]["content"]
-    with open("analysis.txt", "w", encoding="utf-8") as file:
-        file.write(output)
+    output = response.choices[0].message.content
+    with open("analysis.txt", "w", encoding="utf-8") as f:
+        f.write(output)
 
 if __name__ == "__main__":
     analyze_market()
