@@ -13,8 +13,7 @@ def fetch_prices():
 
 def analyze_market():
     prices = fetch_prices()
-    summary = "قیمت لحظه‌ای ارزهای دیجیتال":
-"
+    summary = "قیمت لحظه‌ای ارزهای دیجیتال:\n"
     for coin, price in prices.items():
         summary += f"- {coin.title()}: ${price['usd']}
 "
