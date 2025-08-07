@@ -5,6 +5,33 @@
     <title>داشبورد ترید</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <style>
+        #ai-btn {
+            margin: 20px auto;
+            display: block;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        #ai-btn:hover {
+            background-color: #45a049;
+        }
+        #analysis-output {
+            margin: 20px;
+            padding: 15px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            direction: rtl;
+            text-align: justify;
+            max-width: 90%;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -33,6 +60,11 @@
         <button onclick="addSecondChart()">➕ افزودن چارت دوم</button>
         <div id="secondChart" class="tv-chart" style="display:none; margin-top:20px;"></div>
         <button onclick="removeSecondChart()" style="display:none;" id="removeBtn">🗑 حذف چارت دوم</button>
+    </section>
+
+    <section>
+        <button id="ai-btn">🤖 نمایش تحلیل هوش مصنوعی</button>
+        <pre id="analysis-output">برای دریافت تحلیل، روی دکمه بالا کلیک کنید...</pre>
     </section>
 
     <footer>
@@ -84,6 +116,12 @@
                 document.getElementById("removeBtn").style.display = "none";
             }
         }
+
+        document.getElementById("ai-btn").addEventListener("click", async () => {
+            const res = await fetch("https://amirpromax1.github.io/analysis.txt");
+            const text = await res.text();
+            document.getElementById("analysis-output").textContent = text;
+        });
 
         // بارگزاری اولیه
         window.onload = function () {
