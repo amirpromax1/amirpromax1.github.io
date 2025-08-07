@@ -1,6 +1,6 @@
 import os
 import requests
-from openai import OpenAI
+import google.generativeai as genai
 
 def fetch_prices():
     url = 'https://api.coingecko.com/api/v3/simple/price'
@@ -14,27 +14,17 @@ def fetch_prices():
 def analyze_market():
     prices = fetch_prices()
 
-    summary = "قیمت لحظه‌ای ارزهای دیجیتال:\n"
+    summary = "📊 قیمت لحظه‌ای ارزهای دیجیتال:\n"
     for coin, price in prices.items():
         summary += f"- {coin.title()}: ${price['usd']}\n"
 
-    prompt = summary + "\nبا توجه به قیمت‌ها، تحلیل کامل شامل:\n- روند کلی بازار\n- تحلیل هر ارز\n- حمایت/مقاومت\n- پیش‌بینی تایم ۴ ساعته\n- پیشنهاد ترید برای هرکدام"
+    prompt = summary + "\nبا توجه به قیمت‌ها، تحلیل کامل شامل:\n- روند کلی بازار\n- تحلیل هر ارز\n- حمایت/مقاومت\n- پیش‌بینی تایم ۴ ساعته\n- پیشنهاد ترید برای هرکدام\nهمه چیز رو به زبان فارسی بنویس."
 
-    client = OpenAI(
-        api_key=os.getenv("OPENROUTER_API_KEY"),
-        base_url="https://openrouter.ai/api/v1"
-    )
+    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+    model = genai.GenerativeModel("gemini-pro")
+    response = model.generate_content(prompt)
 
-    response = client.chat.completions.create(
-    model="google/gemini-2.5-pro",
-    messages=[
-        {"role": "system", "content": "شما یک تحلیل‌گر حرفه‌ای بازار کریپتو هستی. تحلیل خود را به زبان فارسی ارائه بده."},
-        {"role": "user", "content": prompt}
-    ],
-    max_tokens=1000  # اضافه کردن این خط
-)
-
-    output = response.choices[0].message.content
+    output = response.text
     with open("analysis.txt", "w", encoding="utf-8") as f:
         f.write(output)
 
