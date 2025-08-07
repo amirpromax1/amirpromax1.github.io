@@ -26,7 +26,7 @@ def analyze_market():
     )
 
     response = client.chat.completions.create(
-        model="openrouter/gpt-3.5-turbo",
+        model="openai/gpt-3.5-turbo",  # مدل معتبر از openrouter
         messages=[
             {"role": "system", "content": "شما یک تحلیل‌گر حرفه‌ای بازار کریپتو هستی. تحلیل خود را به زبان فارسی ارائه بده."},
             {"role": "user", "content": prompt}
