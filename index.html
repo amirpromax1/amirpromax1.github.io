@@ -117,13 +117,13 @@
             }
         }
 
+        // ✅ اصلاح fetch برای دریافت فایل تحلیل
         document.getElementById("ai-btn").addEventListener("click", async () => {
-            const res = await fetch("https://amirpromax1.github.io/analysis.txt");
+            const res = await fetch("https://raw.githubusercontent.com/amirpromax1/amirpromax1.github.io/main/analysis.txt");
             const text = await res.text();
             document.getElementById("analysis-output").textContent = text;
         });
 
-        // بارگزاری اولیه
         window.onload = function () {
             loadChart(lastSymbol);
         };
