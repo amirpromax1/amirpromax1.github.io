@@ -23,8 +23,9 @@
         #analysis-output {
             margin: 20px;
             padding: 15px;
-            background: white;
-            border: 1px solid #ccc;
+            background: #222;
+            color: #f1f1f1;
+            border: 1px solid #555;
             border-radius: 6px;
             white-space: pre-wrap;
             direction: rtl;
@@ -117,7 +118,6 @@
             }
         }
 
-        // ✅ اصلاح fetch برای دریافت فایل تحلیل
         document.getElementById("ai-btn").addEventListener("click", async () => {
             const res = await fetch("https://raw.githubusercontent.com/amirpromax1/amirpromax1.github.io/main/analysis.txt");
             const text = await res.text();
