@@ -1,56 +1,41 @@
 import openai
 import requests
-import os
 
-def get_market_prices():
-    coins = [
-        "bitcoin", "ethereum", "binancecoin", "solana",
-        "ripple", "cardano", "dogecoin", "avalanche-2",
-        "polkadot", "tron"
-    ]
-    url = f"https://api.coingecko.com/api/v3/simple/price?ids={','.join(coins)}&vs_currencies=usd"
-    try:
-        res = requests.get(url)
-        res.raise_for_status()
-        prices = res.json()
-        return prices
-    except Exception as e:
-        return {}
+def get_prices():
+    coins = ["bitcoin", "ethereum", "bnb", "ripple", "solana", "cardano", "dogecoin", "avalanche", "tron", "polkadot"]
+    ids = "%2C".join(coins)
+    url = f"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd"
+    response = requests.get(url)
+    data = response.json()
+    return data
 
-def create_prompt(prices):
-    message = "با توجه به داده‌های قیمت لحظه‌ای ارزهای دیجیتال زیر، یک تحلیل کامل بده:
+def format_price_summary(prices):
+    summary = ""
+    for coin, price in prices.items():
+        summary += f"{coin.title()}: ${price['usd']}
 "
-    for coin, data in prices.items():
-        usd = data.get("usd", "نامشخص")
-        message += f"- {coin.title()}: ${usd}
-"
-    message += "\nتحلیل شامل موارد زیر باشد:\n"
-    message += "- روند کلی بازار\n"
-    message += "- روند هر ارز\n"
-    message += "- نقاط حمایت و مقاومت هر کدام\n"
-    message += "- پیش‌بینی در تایم‌فریم ۴ ساعته\n"
-    message += "- یک پیشنهاد ترید برای هرکدام\n"
-    return message
+    return summary
 
 def analyze_market():
-    prices = get_market_prices()
-    prompt = create_prompt(prices)
+    prices = get_prices()
+    price_summary = format_price_summary(prices)
 
-    openai.api_key = os.getenv("OPENROUTER_API_KEY")
-    openai.api_base = "https://openrouter.ai/api/v1"
+    message = f"""با توجه به داده‌های قیمت لحظه‌ای ارزهای دیجیتال زیر، یک تحلیل کامل بده:
+{price_summary}"""
 
     response = openai.ChatCompletion.create(
-        model="openrouter/gpt-3.5-turbo",
+        model="openrouter/mistralai/mistral-7b-instruct",
+        api_key=os.getenv("OPENROUTER_API_KEY"),
         messages=[
-            {"role": "system", "content": "شما یک تحلیل‌گر حرفه‌ای ارز دیجیتال هستید."},
-            {"role": "user", "content": prompt}
+            {"role": "system", "content": "شما یک تحلیل‌گر حرفه‌ای بازار رمزارز هستید."},
+            {"role": "user", "content": message}
         ]
     )
 
-    analysis = response["choices"][0]["message"]["content"]
+    analysis = response.choices[0].message.content
 
-    with open("analysis.txt", "w", encoding="utf-8") as f:
-        f.write(analysis)
+    with open("analysis.txt", "w", encoding="utf-8") as file:
+        file.write(analysis)
 
 if __name__ == "__main__":
     analyze_market()
