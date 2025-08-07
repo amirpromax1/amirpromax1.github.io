@@ -13,12 +13,12 @@ def fetch_prices():
 
 def analyze_market():
     prices = fetch_prices()
+
     summary = "قیمت لحظه‌ای ارزهای دیجیتال:\n"
     for coin, price in prices.items():
-        summary += f"- {coin.title()}: ${price['usd']}
-"
+        summary += f"- {coin.title()}: ${price['usd']}\n"
 
-    prompt = summary + "\nبا توجه به قیمت‌ها، تحلیل کامل شامل:\n- روند کلی بازار\n- تحلیل هر ارز\n- حمایت/مقاومت\n- پیش‌بینی تایم ۴ ساعته\n- پیشنهاد ترید"
+    prompt = summary + "\nبا توجه به قیمت‌ها، تحلیل کامل شامل:\n- روند کلی بازار\n- تحلیل هر ارز\n- حمایت/مقاومت\n- پیش‌بینی تایم ۴ ساعته\n- پیشنهاد ترید برای هرکدام"
 
     client = OpenAI(
         api_key=os.getenv("OPENROUTER_API_KEY"),
@@ -28,7 +28,7 @@ def analyze_market():
     response = client.chat.completions.create(
         model="openrouter/gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "شما یک تحلیل‌گر حرفه‌ای ارز دیجیتال هستی."},
+            {"role": "system", "content": "شما یک تحلیل‌گر حرفه‌ای بازار کریپتو هستی. تحلیل خود را به زبان فارسی ارائه بده."},
             {"role": "user", "content": prompt}
         ]
     )
