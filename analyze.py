@@ -3,6 +3,7 @@ import os
 
 def analyze_market():
     openai.api_key = os.getenv("OPENROUTER_API_KEY")
+    openai.api_base = "https://openrouter.ai/api/v1"  # ✅ مهم
 
     prompt = (
         "1. روند کلی مارکت کریپتو رو تحلیل کن\n"
@@ -13,7 +14,7 @@ def analyze_market():
     )
 
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="openrouter/gpt-3.5-turbo",  # ✅ برای OpenRouter این فرمت درسته
         messages=[
             {"role": "system", "content": "شما یک تحلیل‌گر حرفه‌ای بازار کریپتو هستی."},
             {"role": "user", "content": prompt}
