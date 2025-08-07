@@ -1,41 +1,42 @@
-import openai
 import requests
-
-def get_prices():
-    coins = ["bitcoin", "ethereum", "bnb", "ripple", "solana", "cardano", "dogecoin", "avalanche", "tron", "polkadot"]
-    ids = "%2C".join(coins)
-    url = f"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd"
-    response = requests.get(url)
-    data = response.json()
-    return data
-
-def format_price_summary(prices):
-    summary = ""
-    for coin, price in prices.items():
-        summary += f"{coin.title()}: ${price['usd']}
-"
-    return summary
+import json
+import os
 
 def analyze_market():
-    prices = get_prices()
-    price_summary = format_price_summary(prices)
+    api_key = os.getenv("OPENROUTER_API_KEY")
 
-    message = f"""با توجه به داده‌های قیمت لحظه‌ای ارزهای دیجیتال زیر، یک تحلیل کامل بده:
-{price_summary}"""
+    message = "با توجه به داده‌های لحظه‌ای قیمت ارزهای دیجیتال زیر، یک تحلیل کامل بده:"
+    coins = ["bitcoin", "ethereum", "bnb", "solana", "xrp", "cardano", "dogecoin", "avalanche", "toncoin", "shiba-inu"]
+    summary = ""
 
-    response = openai.ChatCompletion.create(
-        model="openrouter/mistralai/mistral-7b-instruct",
-        api_key=os.getenv("OPENROUTER_API_KEY"),
-        messages=[
-            {"role": "system", "content": "شما یک تحلیل‌گر حرفه‌ای بازار رمزارز هستید."},
-            {"role": "user", "content": message}
+    for coin in coins:
+        url = f"https://api.coingecko.com/api/v3/simple/price?ids={coin}&vs_currencies=usd"
+        response = requests.get(url)
+        price = response.json().get(coin, {}).get('usd', 'نامشخص')
+        summary += f"{coin.title()}: ${price}\n"
+
+    full_prompt = f"""{message}
+{summary}
+تحلیل بازار را در تایم فریم ۴ ساعته بنویس و در پایان یک پیشنهاد ترید بده."""
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": "openrouter/gpt-3.5-turbo",
+        "messages": [
+            {"role": "user", "content": full_prompt}
         ]
-    )
+    }
 
-    analysis = response.choices[0].message.content
+    response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
 
-    with open("analysis.txt", "w", encoding="utf-8") as file:
-        file.write(analysis)
+    result = response.json()
+    output = result["choices"][0]["message"]["content"]
 
-if __name__ == "__main__":
-    analyze_market()
+    with open("analysis.txt", "w", encoding="utf-8") as f:
+        f.write(output)
+
+analyze_market()
