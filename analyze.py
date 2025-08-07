@@ -1,42 +1,44 @@
 import requests
-import json
 import os
 
 def analyze_market():
     api_key = os.getenv("OPENROUTER_API_KEY")
-
-    message = "با توجه به داده‌های لحظه‌ای قیمت ارزهای دیجیتال زیر، یک تحلیل کامل بده:"
-    coins = ["bitcoin", "ethereum", "bnb", "solana", "xrp", "cardano", "dogecoin", "avalanche", "toncoin", "shiba-inu"]
-    summary = ""
-
-    for coin in coins:
-        url = f"https://api.coingecko.com/api/v3/simple/price?ids={coin}&vs_currencies=usd"
-        response = requests.get(url)
-        price = response.json().get(coin, {}).get('usd', 'نامشخص')
-        summary += f"{coin.title()}: ${price}\n"
-
-    full_prompt = f"""{message}
-{summary}
-تحلیل بازار را در تایم فریم ۴ ساعته بنویس و در پایان یک پیشنهاد ترید بده."""
-
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
 
+    message = """
+با توجه به داده‌های لحظه‌ای قیمت ارزهای دیجیتال زیر، یک تحلیل کامل بده.
+- روند کلی مارکت
+- تحلیل روند هر کدوم از ۱۰ ارز برتر
+- نقاط حمایت و مقاومت هرکدام
+- پیش‌بینی تایم فریم ۴ ساعته
+- پیشنهاد ترید هوش مصنوعی برای هرکدام
+پاسخ رو کامل، دقیق و منظم بده.
+"""
+
     data = {
         "model": "openrouter/gpt-3.5-turbo",
         "messages": [
-            {"role": "user", "content": full_prompt}
+            {"role": "user", "content": message}
         ]
     }
 
     response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
 
-    result = response.json()
-    output = result["choices"][0]["message"]["content"]
+    try:
+        result = response.json()
+        output = result["choices"][0]["message"]["content"]
 
-    with open("analysis.txt", "w", encoding="utf-8") as f:
-        f.write(output)
+        with open("analysis.txt", "w", encoding="utf-8") as f:
+            f.write(output)
 
-analyze_market()
+        print("✅ تحلیل ذخیره شد.")
+    except Exception as e:
+        print("❌ خطا در دریافت پاسخ:")
+        print(response.text)
+        raise e
+
+if __name__ == "__main__":
+    analyze_market()
